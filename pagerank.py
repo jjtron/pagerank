@@ -108,32 +108,11 @@ def sample_pagerank(corpus, damping_factor, n):
     random_page = pages_array[r]
     page_sample_array = []
     page_sample_array = rec(corpus, random_page, damping_factor, n, page_sample_array, nInit)
-    r1 = 0
-    r2 = 0
-    r3 = 0
-    r4 = 0
-    for r in page_sample_array:
-        
-        if r == '1':
-            r1 += 1
-        if r == '2':
-            r2 += 1
-        if r == '3':
-            r3 += 1
-        if r == '4':
-            r4 += 1
 
     retval = {}
-    retval['1'] = r1 / nInit
-    retval['2'] = r2 / nInit
-    retval['3'] = r3 / nInit
-    retval['4'] = r4 / nInit
-    print("r1: ", r1 / nInit )
-    print("r2: ", r2 / nInit )
-    print("r3: ", r3 / nInit )
-    print("r4: ", r4 / nInit )
-    print(":( sample_pagerank returns correct results for simple corpus")
-    print("expected pagerank 1 to be in range [0.16991, 0.26991], got 0.037500000000000006 instead")
+    for page in corpus:
+        retval[page] = page_sample_array.count(page) / nInit
+
     return retval
 
 
