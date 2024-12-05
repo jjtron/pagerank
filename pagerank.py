@@ -6,7 +6,6 @@ import sys
 sys.setrecursionlimit(11000)
 DAMPING = 0.85
 SAMPLES = 10000
-PAGE_RANK_ARRAY = []
 
 '''
 {'1': {'2'}, '2': {'3', '1'}, '3': {'2', '5', '4'}, '4': {'2', '1'}, '5': set()}
@@ -29,26 +28,7 @@ def main():
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
 
-    r1 = 0
-    r2 = 0
-    r3 = 0
-    r4 = 0
-    for r in PAGE_RANK_ARRAY:
-        if r == '1':
-            r1 += 1
-        if r == '2':
-            r2 += 1
-        if r == '3':
-            r3 += 1
-        if r == '4':
-            r4 += 1
 
-    print("r1: ", r1 / 10000 )
-    print("r2: ", r2 / 10000 )
-    print("r3: ", r3 / 10000 )
-    print("r4: ", r4 / 10000 )
-    print(":( sample_pagerank returns correct results for simple corpus")
-    print("expected pagerank 1 to be in range [0.16991, 0.26991], got 0.037500000000000006 instead")
     return
 
     ranks = iterate_pagerank(corpus, DAMPING)
@@ -120,23 +100,49 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-
+    nInit = n
     pages_array = []
     r = random.randrange(0, len(corpus))
     for page in corpus:
         pages_array.append(page)
     random_page = pages_array[r]
-    retval = rec(corpus, random_page, damping_factor, n)
+    page_sample_array = []
+    page_sample_array = rec(corpus, random_page, damping_factor, n, page_sample_array, nInit)
+    r1 = 0
+    r2 = 0
+    r3 = 0
+    r4 = 0
+    for r in page_sample_array:
+        
+        if r == '1':
+            r1 += 1
+        if r == '2':
+            r2 += 1
+        if r == '3':
+            r3 += 1
+        if r == '4':
+            r4 += 1
 
+    retval = {}
+    retval['1'] = r1 / nInit
+    retval['2'] = r2 / nInit
+    retval['3'] = r3 / nInit
+    retval['4'] = r4 / nInit
+    print("r1: ", r1 / nInit )
+    print("r2: ", r2 / nInit )
+    print("r3: ", r3 / nInit )
+    print("r4: ", r4 / nInit )
+    print(":( sample_pagerank returns correct results for simple corpus")
+    print("expected pagerank 1 to be in range [0.16991, 0.26991], got 0.037500000000000006 instead")
     return retval
 
 
-def rec(corpus, random_page, damping_factor, n):
+def rec(corpus, random_page, damping_factor, n, page_sample_array, nInit):
 
     dist = transition_model(corpus, random_page, damping_factor)
     n -= 1
     if n == 0:
-        return dist
+        return page_sample_array
 
     dist_array = []
     for p in dist:
@@ -149,8 +155,8 @@ def rec(corpus, random_page, damping_factor, n):
         weights.append(item[1])
     
     sample = random.choices(pages, weights = weights, k = 1)
-    PAGE_RANK_ARRAY.append(sample[0])
-    return rec(corpus, sample[0], damping_factor, n)
+    page_sample_array.append(sample[0])
+    return rec(corpus, sample[0], damping_factor, n, page_sample_array, nInit)
 
 
 def iterate_pagerank(corpus, damping_factor):
