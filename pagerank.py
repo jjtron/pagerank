@@ -28,10 +28,7 @@ def main():
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
 
-
-    return
-
-    ranks = iterate_pagerank(corpus, DAMPING)
+    ranks = iterate_pagerank({'1': {'2'}, '2': {'1', '3'}, '3': {'4', '2'}, '4': {'2'}}, DAMPING)
     print(f"PageRank Results from Iteration")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
@@ -147,8 +144,67 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
 
+    # Set up initial transition model, all equaly weighted
+    N = 0 #total number of pages
+    for page in corpus:
+        N += 1
+    initial_dist = {}
+    for page in corpus:
+        initial_dist[page] = 1 / N
+    # Pick a random page
+    pages_array = []
+    r = random.randrange(0, len(corpus))
+    for page in corpus:
+        pages_array.append(page)
+    random_page = pages_array[r]
+
+    # Intialize page sample array
+    page_sample_array = []
+    page_sample_array = rec(corpus, random_page, damping_factor, 2, page_sample_array, 1)
+
+    # Initialize PREVIOUS_RETVAL
+    PREVIOUS_RETVAL = {}
+    for page in corpus:
+        PREVIOUS_RETVAL[page] = 0
+
+    # Initialize False = convergence 
+    convergence = False
+    n = 0
+    TEMPORARY = 100
+    while not convergence:
+        # Pick a random page
+        pages_array = []
+        r = random.randrange(0, len(corpus))
+        for page in corpus:
+            pages_array.append(page)
+        random_page = pages_array[r]
+
+        # get the next retval
+        n += 1
+        page_sample_array = rec(corpus, random_page, damping_factor, 2, page_sample_array, 1)
+        retval = {}
+        for page in corpus:
+            retval[page] = page_sample_array.count(page) / ( n + 1 )
+
+        # COMPARE WITH PREVIOUS_RETVAL
+        is_all_less_than_point001 = True
+        for page in retval:
+            if abs(PREVIOUS_RETVAL[page] - retval[page]) >= .001:
+                is_all_less_than_point001 = False
+
+        if not is_all_less_than_point001:
+            PREVIOUS_RETVAL = retval.copy()
+
+        if is_all_less_than_point001:
+            sum = 0
+            for p in retval:
+                sum += retval[p]
+            # Compare each page of 
+            convergence = True
+            return retval
+
+    return None
 
 if __name__ == "__main__":
     main()
