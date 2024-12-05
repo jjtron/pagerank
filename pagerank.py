@@ -7,12 +7,12 @@ sys.setrecursionlimit(11000)
 DAMPING = 0.85
 SAMPLES = 10000
 
-
 def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
+    print(ranks)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
@@ -92,19 +92,16 @@ def sample_pagerank(corpus, damping_factor, n):
         pages_array.append(page)
     random_page = pages_array[r]
     retval = rec(corpus, random_page, damping_factor, n)
-    
-    return(retval)
+
+    return retval
 
 
 def rec(corpus, random_page, damping_factor, n):
-    n -= 1
-    if n > 9995:
-        print("random_page: ", random_page)
-    if n == 0:
-        #print(corpus)
-        return corpus
 
     dist = transition_model(corpus, random_page, damping_factor)
+    n -= 1
+    if n == 0:
+        return dist
 
     dist_array = []
     for p in dist:
@@ -117,7 +114,7 @@ def rec(corpus, random_page, damping_factor, n):
         weights.append(item[1])
 
     sample = random.choices(pages, weights = weights, k = 1)
-    rec(corpus, sample[0], damping_factor, n)
+    return rec(corpus, sample[0], damping_factor, n)
 
 
 def iterate_pagerank(corpus, damping_factor):
