@@ -3,6 +3,7 @@ import random
 import re
 import sys
 
+sys.setrecursionlimit(11000)
 DAMPING = 0.85
 SAMPLES = 10000
 
@@ -71,10 +72,6 @@ def transition_model(corpus, page, damping_factor):
     for link in corpus:
         if not link in corpus.get(page):
             return_dict[link] = first_term
-
-    n = 0
-    for link in return_dict:
-        n += return_dict.get(link)
     
     return return_dict
 
@@ -88,7 +85,39 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+
+    pages_array = []
+    r = random.randrange(0, len(corpus))
+    for page in corpus:
+        pages_array.append(page)
+    random_page = pages_array[r]
+    retval = rec(corpus, random_page, damping_factor, n)
+    
+    return(retval)
+
+
+def rec(corpus, random_page, damping_factor, n):
+    n -= 1
+    if n > 9995:
+        print("random_page: ", random_page)
+    if n == 0:
+        #print(corpus)
+        return corpus
+
+    dist = transition_model(corpus, random_page, damping_factor)
+
+    dist_array = []
+    for p in dist:
+        dist_array.append([p, dist[p]])
+
+    pages = []
+    weights = []
+    for i, item in enumerate(dist_array):
+        pages.append(item[0])
+        weights.append(item[1])
+
+    sample = random.choices(pages, weights = weights, k = 1)
+    rec(corpus, sample[0], damping_factor, n)
 
 
 def iterate_pagerank(corpus, damping_factor):
