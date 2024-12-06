@@ -97,23 +97,22 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    nInit = n
     pages_array = []
     r = random.randrange(0, len(corpus))
     for page in corpus:
         pages_array.append(page)
     random_page = pages_array[r]
     page_sample_array = []
-    page_sample_array = rec(corpus, random_page, damping_factor, n, page_sample_array, nInit)
+    page_sample_array = rec(corpus, random_page, damping_factor, n, page_sample_array)
 
     retval = {}
     for page in corpus:
-        retval[page] = page_sample_array.count(page) / nInit
+        retval[page] = page_sample_array.count(page) / ( len(page_sample_array) )
 
     return retval
 
 
-def rec(corpus, random_page, damping_factor, n, page_sample_array, nInit):
+def rec(corpus, random_page, damping_factor, n, page_sample_array):
 
     dist = transition_model(corpus, random_page, damping_factor)
     n -= 1
@@ -132,7 +131,7 @@ def rec(corpus, random_page, damping_factor, n, page_sample_array, nInit):
     
     sample = random.choices(pages, weights = weights, k = 1)
     page_sample_array.append(sample[0])
-    return rec(corpus, sample[0], damping_factor, n, page_sample_array, nInit)
+    return rec(corpus, sample[0], damping_factor, n, page_sample_array)
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -161,7 +160,6 @@ def iterate_pagerank(corpus, damping_factor):
 
     # Intialize page sample array
     page_sample_array = []
-    page_sample_array = rec(corpus, random_page, damping_factor, 2, page_sample_array, 1)
 
     # Initialize PREVIOUS_RETVAL
     PREVIOUS_RETVAL = {}
@@ -170,8 +168,6 @@ def iterate_pagerank(corpus, damping_factor):
 
     # Initialize False = convergence 
     convergence = False
-    n = 0
-    TEMPORARY = 100
     while not convergence:
         # Pick a random page
         pages = []
@@ -181,18 +177,17 @@ def iterate_pagerank(corpus, damping_factor):
             weights.append(retval[item])
         
         sample = random.choices(pages, weights = weights, k = 1)
+        page_sample_array.append(sample[0])
 
         # get the next retval
-        n += 1
-        page_sample_array = rec(corpus, sample[0], damping_factor, 2, page_sample_array, 1)
-        retval = {}
+        page_sample_array = rec(corpus, sample[0], damping_factor, 2, page_sample_array)
         for page in corpus:
-            retval[page] = page_sample_array.count(page) / ( n + 1 )
+            retval[page] = page_sample_array.count(page) / ( len(page_sample_array) )
 
         # COMPARE WITH PREVIOUS_RETVAL
         is_all_less_than_point001 = True
         for page in retval:
-            if abs(PREVIOUS_RETVAL[page] - retval[page]) >= .001:
+            if abs(PREVIOUS_RETVAL[page] - retval[page]) > .001:
                 is_all_less_than_point001 = False
 
         if not is_all_less_than_point001:
