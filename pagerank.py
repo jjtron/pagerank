@@ -3,9 +3,9 @@ import random
 import re
 import sys
 
-sys.setrecursionlimit(11000)
+sys.setrecursionlimit(50001)
 DAMPING = 0.85
-SAMPLES = 10000
+SAMPLES = 49000
 
 '''
 {'1': {'2'}, '2': {'3', '1'}, '3': {'2', '5', '4'}, '4': {'2', '1'}, '5': set()}
@@ -180,7 +180,7 @@ def iterate_pagerank(corpus, damping_factor):
         page_sample_array.append(sample[0])
 
         # get the next retval
-        page_sample_array = rec(corpus, sample[0], damping_factor, 2, page_sample_array)
+        page_sample_array = rec(corpus, sample[0], damping_factor, SAMPLES, page_sample_array)
         for page in corpus:
             retval[page] = page_sample_array.count(page) / ( len(page_sample_array) )
 
