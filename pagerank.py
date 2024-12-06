@@ -149,9 +149,9 @@ def iterate_pagerank(corpus, damping_factor):
     N = 0 #total number of pages
     for page in corpus:
         N += 1
-    initial_dist = {}
+    retval = {}
     for page in corpus:
-        initial_dist[page] = 1 / N
+        retval[page] = 1 / N
     # Pick a random page
     pages_array = []
     r = random.randrange(0, len(corpus))
@@ -174,15 +174,17 @@ def iterate_pagerank(corpus, damping_factor):
     TEMPORARY = 100
     while not convergence:
         # Pick a random page
-        pages_array = []
-        r = random.randrange(0, len(corpus))
-        for page in corpus:
-            pages_array.append(page)
-        random_page = pages_array[r]
+        pages = []
+        weights = []
+        for item in retval:
+            pages.append(item)
+            weights.append(retval[item])
+        
+        sample = random.choices(pages, weights = weights, k = 1)
 
         # get the next retval
         n += 1
-        page_sample_array = rec(corpus, random_page, damping_factor, 2, page_sample_array, 1)
+        page_sample_array = rec(corpus, sample[0], damping_factor, 2, page_sample_array, 1)
         retval = {}
         for page in corpus:
             retval[page] = page_sample_array.count(page) / ( n + 1 )
