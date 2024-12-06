@@ -12,7 +12,7 @@ def main():
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
     ranks = sample_pagerank(
-        {'1': {'2'}, '2': {'3', '1'}, '3': {'2', '4'}, '4': {'2'}},
+        corpus,
         DAMPING,
         SAMPLES
     )
@@ -21,7 +21,7 @@ def main():
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
 
-    ranks = iterate_pagerank({'1': {'2'}, '2': {'1', '3'}, '3': {'4', '2'}, '4': {'2'}}, DAMPING)
+    ranks = iterate_pagerank(corpus, DAMPING)
     print(f"PageRank Results from Iteration")
     for page in sorted(ranks):
         print(f"  {page}: {ranks[page]:.4f}")
